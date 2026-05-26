@@ -27,3 +27,16 @@ export interface JWTPayload {
   userId: string;
   email: string;
 }
+
+export interface Company {
+  id: string;
+  user_id: string;
+  name: string;
+  machine_count: number;
+  created_at: Date;
+}
+
+export interface CreateCompanyRequest {
+  name: string;
+  machineCount: number;
+}
