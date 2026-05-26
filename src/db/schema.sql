@@ -36,3 +36,15 @@ CREATE TABLE IF NOT EXISTS companies (
 );
 
 CREATE INDEX IF NOT EXISTS idx_companies_user_id ON companies(user_id);
+
+-- Employees table
+CREATE TABLE IF NOT EXISTS employees (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+  name VARCHAR(255) NOT NULL,
+  phone VARCHAR(50),
+  image_data TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_employees_company_id ON employees(company_id);
