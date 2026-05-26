@@ -12,10 +12,20 @@ const app: Express = express();
 
 const allowedOrigins = config.CORS_ORIGIN.split(",").map((o) => o.trim());
 
+function isOriginAllowed(origin: string): boolean {
+  return allowedOrigins.some((pattern) => {
+    if (pattern.includes("*")) {
+      const regex = new RegExp("^" + pattern.replace(/\./g, "\\.").replace(/\*/g, ".*") + "$");
+      return regex.test(origin);
+    }
+    return pattern === origin;
+  });
+}
+
 // Middleware
 app.use((req: Request, res: Response, next: NextFunction) => {
   const origin = req.headers.origin as string | undefined;
-  if (origin && allowedOrigins.includes(origin)) {
+  if (origin && isOriginAllowed(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
   }
   res.setHeader("Access-Control-Allow-Credentials", "true");
