@@ -6,7 +6,7 @@ import {
   generateRefreshToken,
   verifyRefreshToken,
 } from "../middleware/auth";
-import { LoginRequest, RegisterRequest, User } from "../types";
+import { LoginRequest, RegisterRequest } from "../types";
 import { config } from "../config/env";
 
 export async function register(req: Request, res: Response): Promise<void> {
@@ -64,14 +64,7 @@ export async function register(req: Request, res: Response): Promise<void> {
       [user.id, refreshToken, expiresAt]
     );
 
-    // Set cookies
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      secure: config.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 15 * 60 * 1000, // 15 minutes
-    });
-
+    // Only refreshToken goes in an HttpOnly cookie — accessToken is managed by js-cookie on the client
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: config.NODE_ENV === "production",
@@ -138,14 +131,7 @@ export async function login(req: Request, res: Response): Promise<void> {
       [user.id, refreshToken, expiresAt]
     );
 
-    // Set cookies
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      secure: config.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 15 * 60 * 1000, // 15 minutes
-    });
-
+    // Only refreshToken goes in an HttpOnly cookie — accessToken is managed by js-cookie on the client
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: config.NODE_ENV === "production",
@@ -211,14 +197,6 @@ export async function refresh(req: Request, res: Response): Promise<void> {
 
     // Generate new access token
     const newAccessToken = generateAccessToken(user.id, user.email);
-
-    // Set cookie
-    res.cookie("accessToken", newAccessToken, {
-      httpOnly: true,
-      secure: config.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 15 * 60 * 1000, // 15 minutes
-    });
 
     res.json({
       accessToken: newAccessToken,
