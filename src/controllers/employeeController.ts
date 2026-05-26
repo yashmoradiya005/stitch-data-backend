@@ -49,6 +49,68 @@ export async function createEmployee(req: Request, res: Response): Promise<void>
   }
 }
 
+export async function updateEmployee(req: Request, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    const { name, phone, imageData } = req.body;
+    const userId = req.user?.userId;
+
+    if (!name?.trim()) {
+      res.status(400).json({ message: "Employee name is required" });
+      return;
+    }
+
+    // Verify employee belongs to a company owned by this user
+    const check = await query(
+      `SELECT e.id FROM employees e
+       JOIN companies c ON e.company_id = c.id
+       WHERE e.id = $1 AND c.user_id = $2`,
+      [id, userId]
+    );
+    if (check.rows.length === 0) {
+      res.status(404).json({ message: "Employee not found" });
+      return;
+    }
+
+    const result = await query(
+      `UPDATE employees
+       SET name = $1, phone = $2, image_data = $3
+       WHERE id = $4
+       RETURNING *`,
+      [name.trim(), phone?.trim() || null, imageData ?? null, id]
+    );
+
+    res.json(mapEmployee(result.rows[0]));
+  } catch (error) {
+    console.error("Update employee error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+export async function deleteEmployee(req: Request, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    const userId = req.user?.userId;
+
+    const check = await query(
+      `SELECT e.id FROM employees e
+       JOIN companies c ON e.company_id = c.id
+       WHERE e.id = $1 AND c.user_id = $2`,
+      [id, userId]
+    );
+    if (check.rows.length === 0) {
+      res.status(404).json({ message: "Employee not found" });
+      return;
+    }
+
+    await query("DELETE FROM employees WHERE id = $1", [id]);
+    res.json({ message: "Employee deleted" });
+  } catch (error) {
+    console.error("Delete employee error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 export async function getEmployees(req: Request, res: Response): Promise<void> {
   try {
     const { companyId } = req.query as { companyId: string };
