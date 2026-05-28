@@ -12,8 +12,15 @@ const app: Express = express();
 
 const allowedOrigins = config.CORS_ORIGIN.split(",").map((o) => o.trim());
 
-// Always allow localhost so local dev is never blocked regardless of env vars
-const LOCALHOST_ORIGINS = ["http://localhost:3000", "http://localhost:3001", "http://127.0.0.1:3000"];
+// Always allow localhost + Capacitor mobile app origins regardless of env vars
+const LOCALHOST_ORIGINS = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "http://127.0.0.1:3000",
+  "capacitor://localhost",   // iOS Capacitor WebView
+  "https://localhost",        // Android Capacitor WebView (https scheme)
+  "http://localhost",         // Android Capacitor WebView (http scheme)
+];
 
 function isOriginAllowed(origin: string): boolean {
   if (LOCALHOST_ORIGINS.includes(origin)) return true;

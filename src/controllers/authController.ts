@@ -156,7 +156,9 @@ export async function login(req: Request, res: Response): Promise<void> {
 
 export async function refresh(req: Request, res: Response): Promise<void> {
   try {
-    const refreshToken = req.cookies?.refreshToken;
+    // Web (proxy): token arrives via httpOnly cookie
+    // Mobile (Capacitor): token sent in request body (cookie can't cross origins)
+    const refreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
 
     if (!refreshToken) {
       res.status(401).json({ message: "Refresh token not found" });
