@@ -71,3 +71,15 @@ CREATE TABLE IF NOT EXISTS stitch_data (
 CREATE INDEX IF NOT EXISTS idx_stitch_data_company_id ON stitch_data(company_id);
 CREATE INDEX IF NOT EXISTS idx_stitch_data_date ON stitch_data(date);
 CREATE INDEX IF NOT EXISTS idx_stitch_data_employee_id ON stitch_data(employee_id);
+
+-- Password reset tokens table
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  token VARCHAR(255) UNIQUE NOT NULL,
+  expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_reset_tokens_token ON password_reset_tokens(token);
+CREATE INDEX IF NOT EXISTS idx_reset_tokens_user_id ON password_reset_tokens(user_id);

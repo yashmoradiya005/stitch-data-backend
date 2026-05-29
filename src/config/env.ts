@@ -10,6 +10,8 @@ export const config = {
   FRONTEND_URL: process.env.FRONTEND_URL || "http://localhost:3000",
   CORS_ORIGIN:
     process.env.CORS_ORIGIN || "http://localhost:3000,https://vercel.com",
+  SENDGRID_API_KEY: process.env.SENDGRID_API_KEY || "",
+  SENDGRID_FROM_EMAIL: process.env.SENDGRID_FROM_EMAIL || "",
 };
 
 if (!config.DATABASE_URL) {
